@@ -63,18 +63,6 @@ export class BookingService {
   }
 
   /**
-   * Retrieves a single booking by its external ID.
-   * @param externalId - The external ID of the booking to retrieve.
-   * @returns The booking corresponding to the provided external ID as a GetBookingResponseDto.
-   * @throws EntityNotFoundError if no booking with the given external ID exists.
-   */
-  async findOneByExternalIdOrThrow(
-    externalId: string,
-  ): Promise<GetBookingResponseDto> {
-    return await this.bookingRepository.findOneByOrFail({ externalId });
-  }
-
-  /**
    * Retrieves a paginated list of bookings based on the provided query parameters.
    * @param data - Data transfer object containing pagination, sorting, and filtering details.
    * @returns A paginated response containing the list of bookings and pagination metadata.

@@ -99,13 +99,13 @@ export class ReservationService {
   async createReservation(
     data: CreateReservationDto,
   ): Promise<GetBookingResponseDto> {
-    const { userId, externalId } = data;
+    const { userId, offerUId } = data;
 
     const { firstName, lastName } =
       await this.userService.findOneByIdOrThrow(userId);
 
     const { confirmationNumber } = await this.carReservationApi({
-      offerUId: externalId,
+      offerUId,
       customer: { name: firstName, surname: lastName },
     });
 
@@ -116,7 +116,7 @@ export class ReservationService {
     }
 
     return await this.bookingService.create({
-      externalId,
+      externalId: offerUId,
       confirmationNumber,
       userId: userId,
     });
