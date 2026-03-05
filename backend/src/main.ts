@@ -28,6 +28,7 @@ async function bootstrap() {
     .setVersion('1.0')
     .addTag('Users', 'User management operations')
     .addTag('Bookings', 'Booking management operations')
+    .addTag('DiscoverCars', 'Car discovery operations')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
