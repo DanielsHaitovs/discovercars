@@ -7,7 +7,7 @@ async function getLocations(
     signal: AbortSignal,
 ): Promise<LocationResponse[]> {
 
-    const response = await fetch(`http://localhost:3001/reservation/locations`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/reservation/locations`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

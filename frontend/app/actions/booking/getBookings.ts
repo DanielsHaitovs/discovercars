@@ -42,7 +42,7 @@ async function getBookings(
         );
     }
 
-    const response = await fetch(`http://localhost:3001/booking/query?page=${page}&limit=${limit}&sortOrder=${sortOrder}&sortField=${sortField}&${params.toString()}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/booking/query?page=${page}&limit=${limit}&sortOrder=${sortOrder}&sortField=${sortField}&${params.toString()}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

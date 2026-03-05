@@ -26,7 +26,7 @@ async function getUserBookings(
     const { page, limit, sortField, sortOrder, userId } = data;
 
 
-    const response = await fetch(`http://localhost:3001/booking/user/${userId}?page=${page}&limit=${limit}&sortOrder=${sortOrder}&sortField=${sortField}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/booking/user/${userId}?page=${page}&limit=${limit}&sortOrder=${sortOrder}&sortField=${sortField}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

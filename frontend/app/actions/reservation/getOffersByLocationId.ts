@@ -8,7 +8,7 @@ async function getOffersByLocationId(
     signal: AbortSignal,
 ): Promise<OfferResponse[]> {
 
-    const response = await fetch(`http://localhost:3001/reservation/offers/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/reservation/offers/${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

@@ -7,7 +7,7 @@ export async function createUser(
     signal: AbortSignal,
 ): Promise<GetPaginatedUserResponse> {
 
-    const response = await fetch(`http://localhost:3001/user`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/user`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

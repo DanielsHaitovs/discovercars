@@ -8,7 +8,7 @@ async function getUser(
     signal: AbortSignal,
 ): Promise<GetUserResponseDto> {
 
-    const response = await fetch(`http://localhost:3001/user/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/user/${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

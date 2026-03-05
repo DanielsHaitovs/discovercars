@@ -8,7 +8,7 @@ async function getUserByEmail(
     signal: AbortSignal,
 ): Promise<GetUserResponseDto> {
 
-    const response = await fetch(`http://localhost:3001/user/email/${email}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/user/email/${email}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',

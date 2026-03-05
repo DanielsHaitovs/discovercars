@@ -7,7 +7,7 @@ async function getBookingById(
     id: number,
     signal: AbortSignal,
 ): Promise<GetPaginatedBookingsResponse> {
-    const response = await fetch(`http://localhost:3001/booking/${id}`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_ORIGIN}/booking/${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
