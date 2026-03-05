@@ -33,7 +33,6 @@ export class BookingService {
     return await this.bookingRepository
       .save(booking)
       .catch((error: TypeOrmError) => {
-        console.log('Error saving booking:', error.driverError.code);
         if (error?.driverError?.code === '23505') {
           throw new ConflictException(
             'A booking with the same externalId or confirmationNumber already exists.',
