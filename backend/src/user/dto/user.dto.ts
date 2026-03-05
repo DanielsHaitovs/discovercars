@@ -2,7 +2,9 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -10,10 +12,9 @@ import {
 import { ToArray } from 'src/common/array.decorator';
 import {
   PaginatedResponseDto,
-  PaginationDto,
   QueryRequestDto,
-  SortDto,
 } from 'src/common/pagination.dto';
+import { UserSortField } from '../user.enum';
 
 export class CreateUserDto {
   @ApiProperty({
@@ -59,7 +60,14 @@ export class GetUserResponseDto extends CreateUserDto {
     example: 1,
     type: Number,
   })
+  @IsNumber()
+  @IsNotEmpty()
   id: number;
+
+  constructor(id: number, email: string, firstName: string, lastName: string) {
+    super(email, firstName, lastName);
+    this.id = id;
+  }
 }
 
 export class GetPaginatedUsersResponseDto extends PaginatedResponseDto {
@@ -83,6 +91,17 @@ export class GetPaginatedUsersResponseDto extends PaginatedResponseDto {
 }
 
 export class GetPaginatedUserRequestDto extends QueryRequestDto {
+  @ApiPropertyOptional({
+    description: 'Filter users by IDs',
+    example: [1, 2],
+    type: Number,
+    isArray: true,
+  })
+  @IsNumber({}, { each: true })
+  @IsOptional()
+  @ToArray()
+  ids?: number[];
+
   @ApiPropertyOptional({
     description: 'Filter users by email addresses',
     example: ['johndoe@gmail.com', 'willsmith@gmail.com'],
@@ -118,14 +137,33 @@ export class GetPaginatedUserRequestDto extends QueryRequestDto {
   @ToArray()
   lastNames?: string[];
 
+  @ApiPropertyOptional({
+    description: 'User field name to sort results by',
+    enum: UserSortField,
+    example: UserSortField.CREATED_AT,
+    type: String,
+  })
+  @IsEnum(UserSortField, {
+    message: `sortField must be one of the following: ${Object.values(
+      UserSortField,
+    ).join(', ')}`,
+  })
+  @IsOptional()
+  sortField?: UserSortField;
+
   constructor(
-    pagination: PaginationDto,
-    sort: SortDto,
+    page: number,
+    limit: number,
+    sortOrder: 'ASC' | 'DESC' = 'ASC',
+    ids?: number[],
+    sortField?: UserSortField,
     emails?: string[],
     firstNames?: string[],
     lastNames?: string[],
   ) {
-    super(pagination, sort);
+    super(page, limit, sortOrder);
+    this.ids = ids;
+    this.sortField = sortField;
     this.emails = emails;
     this.firstNames = firstNames;
     this.lastNames = lastNames;

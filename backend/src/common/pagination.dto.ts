@@ -1,14 +1,10 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 import {
-  IsEnum,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Min,
-  ValidateNested,
-} from 'class-validator';
+  ApiProperty,
+  ApiPropertyOptional,
+  IntersectionType,
+} from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsEnum, IsInt, IsNumber, IsOptional, Min } from 'class-validator';
 
 /**
  * Request DTO for pagination parameters in API queries.
@@ -52,44 +48,6 @@ export class PaginationDto {
 }
 
 /**
- * DTO for sorting configuration in list queries.
- *
- * Provides standardized sorting controls across all list endpoints to ensure
- * predictable result ordering and consistent API behavior. Supports both
- * ascending and descending sort orders for flexible data presentation.
- */
-export class SortDto {
-  @ApiPropertyOptional({
-    description: 'Entity field name to sort results by',
-    example: 'createdAt',
-    type: String,
-  })
-  @IsString()
-  @IsOptional()
-  sortField?: string;
-
-  @ApiPropertyOptional({
-    description: 'Sort direction for result ordering',
-    example: 'ASC',
-    enum: ['ASC', 'DESC'],
-    type: String,
-    default: 'ASC',
-    required: false,
-  })
-  @IsEnum(['ASC', 'DESC'], {
-    message: 'sortOrder must be either ASC or DESC',
-    each: true,
-  })
-  @IsOptional()
-  sortOrder: 'ASC' | 'DESC';
-
-  constructor(sortOrder: 'ASC' | 'DESC' = 'ASC', sortField?: string) {
-    this.sortField = sortField;
-    this.sortOrder = sortOrder;
-  }
-}
-
-/**
  * Base response wrapper for paginated API endpoints providing metadata about result sets.
  *
  * Implements standard pagination metadata pattern used across all paginated responses
@@ -123,29 +81,24 @@ export class PaginatedResponseDto extends PaginationDto {
   }
 }
 
-export class QueryRequestDto {
-  @ApiProperty({
-    description:
-      'Pagination parameters to control page size and number of results',
-    type: PaginationDto,
-    required: true,
+export class QueryRequestDto extends IntersectionType(PaginationDto) {
+  @ApiPropertyOptional({
+    description: 'Sort direction for result ordering',
+    example: 'ASC',
+    enum: ['ASC', 'DESC'],
+    type: String,
+    default: 'ASC',
+    required: false,
   })
-  @Type(() => PaginationDto)
-  @ValidateNested()
-  pagination: PaginationDto;
-
-  @ApiProperty({
-    description:
-      'Pagination parameters to control page size and number of results',
-    type: SortDto,
-    required: true,
+  @IsEnum(['ASC', 'DESC'], {
+    message: 'sortOrder must be either ASC or DESC',
+    each: true,
   })
-  @Type(() => SortDto)
-  @ValidateNested()
-  sort: SortDto;
+  @IsOptional()
+  sortOrder: 'ASC' | 'DESC';
 
-  constructor(pagination: PaginationDto, sort: SortDto) {
-    this.pagination = pagination;
-    this.sort = sort;
+  constructor(page: number, limit: number, sortOrder: 'ASC' | 'DESC' = 'ASC') {
+    super(page, limit);
+    this.sortOrder = sortOrder;
   }
 }
