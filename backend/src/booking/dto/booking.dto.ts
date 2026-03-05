@@ -15,8 +15,7 @@ import {
   PaginatedResponseDto,
   QueryRequestDto,
 } from 'src/common/pagination.dto';
-import { Type } from 'class-transformer';
-import { ToArray } from 'src/common/array.decorator';
+import { Transform, Type } from 'class-transformer';
 import { BookingSortFields } from '../booking.enum';
 import { GetUserResponseDto } from 'src/user/dto/user.dto';
 
@@ -161,7 +160,9 @@ export class GetPaginatedBookingRequestDto extends QueryRequestDto {
   })
   @IsNumber({}, { each: true })
   @IsOptional()
-  @ToArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(Number) : [Number(value)],
+  )
   ids?: number[];
 
   @ApiPropertyOptional({
@@ -175,7 +176,9 @@ export class GetPaginatedBookingRequestDto extends QueryRequestDto {
   })
   @IsString({ each: true })
   @IsOptional()
-  @ToArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(String) : [String(value)],
+  )
   externalIds?: string[];
 
   @ApiPropertyOptional({
@@ -186,7 +189,9 @@ export class GetPaginatedBookingRequestDto extends QueryRequestDto {
   })
   @IsString({ each: true })
   @IsOptional()
-  @ToArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(String) : [String(value)],
+  )
   confirmationNumbers?: string[];
 
   @ApiPropertyOptional({
@@ -197,7 +202,9 @@ export class GetPaginatedBookingRequestDto extends QueryRequestDto {
   })
   @IsNumber({}, { each: true })
   @IsOptional()
-  @ToArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(Number) : [Number(value)],
+  )
   userIds?: number[];
 
   @ApiPropertyOptional({
@@ -208,7 +215,9 @@ export class GetPaginatedBookingRequestDto extends QueryRequestDto {
   })
   @IsEmail({}, { each: true })
   @IsOptional()
-  @ToArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(String) : [String(value)],
+  )
   emails?: string[];
 
   @ApiPropertyOptional({
@@ -220,7 +229,9 @@ export class GetPaginatedBookingRequestDto extends QueryRequestDto {
   })
   @IsString({ each: true })
   @IsOptional()
-  @ToArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(String) : [String(value)],
+  )
   firstNames?: string[];
 
   @ApiPropertyOptional({
@@ -232,7 +243,9 @@ export class GetPaginatedBookingRequestDto extends QueryRequestDto {
   })
   @IsString({ each: true })
   @IsOptional()
-  @ToArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(String) : [String(value)],
+  )
   lastNames?: string[];
 
   @ApiPropertyOptional({

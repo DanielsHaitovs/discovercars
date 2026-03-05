@@ -1,4 +1,4 @@
-import { PaginationRequest } from "./pagination.type";
+import { PaginationRequest, PaginationResponse } from "./pagination.type";
 import { GetUserResponseDto } from "./user.type";
 
 export const BookingSortFields = [
@@ -9,10 +9,11 @@ export const BookingSortFields = [
 ] as const;
 
 export type GetBookingResponseDto = {
-    id: number;
-    externalId: string;
-    confirmationNumber: string;
-    user: GetUserResponseDto;
+  id: number;
+  externalId: string;
+  confirmationNumber: string;
+  createdAt: string;
+  user: GetUserResponseDto;
 }
 
 export type GetPaginatedBookingsRequest = PaginationRequest & {
@@ -26,7 +27,7 @@ export type GetPaginatedBookingsRequest = PaginationRequest & {
   sortField?: typeof BookingSortFields[number];
 }
 
-export type GetPaginatedBookingsResponse = PaginationRequest & {
+export type GetPaginatedBookingsResponse = PaginationResponse & {
   data: GetBookingResponseDto[];
 }
 
@@ -35,6 +36,6 @@ export type GetPaginatedUserBookingsRequest = PaginationRequest & {
   sortField?: typeof BookingSortFields[number];
 }
 
-export type GetPaginatedUserBookingsResponse = PaginationRequest & {
+export type GetPaginatedUserBookingsResponse = PaginationResponse & {
   data: GetBookingResponseDto[];
 }

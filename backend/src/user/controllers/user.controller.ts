@@ -128,10 +128,58 @@ export class UserController {
     },
   })
   @ApiOkResponse({
-    description: 'The user has been successfully created.',
+    description: 'The user has been successfully retrieved.',
     type: GetUserResponseDto,
   })
   async findOneById(@Param('id', ParseIntPipe) id: number) {
     return await this.userService.findOneByIdOrThrow(id);
+  }
+
+  @Get('email/:email')
+  @ApiParam({
+    name: 'email',
+    description: 'The email address of the user to retrieve',
+    example: 'test@gmail.com',
+  })
+  @ApiOperation({
+    summary: 'Get user by email',
+    description: 'Retrieves a user by their email address.',
+  })
+  @ApiBadRequestResponse({
+    description:
+      'Invalid email address. Please ensure the email is in a valid format.',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 400 },
+        message: {
+          type: 'string',
+          example: 'Validation failed (email must be an string)',
+        },
+        error: { type: 'string', example: BadRequestException.name },
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description:
+      'User not found. No user exists with the provided email address.',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 404 },
+        message: {
+          type: 'string',
+          example: 'No entity found for User with email test@gmail.com',
+        },
+        error: { type: 'string', example: 'EntityNotFoundError' },
+      },
+    },
+  })
+  @ApiOkResponse({
+    description: 'The user has been successfully retrieved.',
+    type: GetUserResponseDto,
+  })
+  async findOneByEmail(@Param('email') email: string) {
+    return await this.userService.findOneByEmailOrThrow(email);
   }
 }

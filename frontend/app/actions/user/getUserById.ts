@@ -1,12 +1,12 @@
 "use client";
 
-import { GetPaginatedUserResponse } from "@/types/user.type";
+import { GetUserResponseDto } from "@/types/user.type";
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 
 async function getUser(
     id: number,
     signal: AbortSignal,
-): Promise<GetPaginatedUserResponse> {
+): Promise<GetUserResponseDto> {
 
     const response = await fetch(`http://localhost:3001/user/${id}`, {
         method: 'GET',

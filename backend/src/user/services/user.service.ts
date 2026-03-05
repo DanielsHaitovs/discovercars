@@ -101,4 +101,14 @@ export class UserService {
   async findOneByIdOrThrow(id: number): Promise<GetUserResponseDto> {
     return await this.userRepository.findOneByOrFail({ id });
   }
+
+  /**
+   * Retrieves a single user by their email address.
+   * @param email - The email address of the user to retrieve.
+   * @returns The user corresponding to the provided email as a GetUserResponseDto.
+   * @throws EntityNotFoundError if no user with the given email exists.
+   */
+  async findOneByEmailOrThrow(email: string): Promise<GetUserResponseDto> {
+    return await this.userRepository.findOneByOrFail({ email });
+  }
 }

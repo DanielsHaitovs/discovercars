@@ -8,6 +8,7 @@ export type CreateUserDto = {
 
 export type GetUserResponseDto = CreateUserDto & {
   id: number;
+  createdAt: string;
 };
 
 export const UserSortField = [
