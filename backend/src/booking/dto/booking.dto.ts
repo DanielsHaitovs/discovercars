@@ -8,6 +8,7 @@ import {
   ValidateNested,
   IsOptional,
   IsEnum,
+  IsEmail,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import {
@@ -17,6 +18,7 @@ import {
 import { Type } from 'class-transformer';
 import { ToArray } from 'src/common/array.decorator';
 import { BookingSortFields } from '../booking.enum';
+import { GetUserResponseDto } from 'src/user/dto/user.dto';
 
 export class CreateBookingDto {
   @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
@@ -58,9 +60,24 @@ export class GetBookingResponseDto extends OmitType(CreateBookingDto, [
   @IsNotEmpty()
   id: number;
 
-  constructor(id: number, externalId: string, confirmationNumber: string) {
+  @ApiProperty({
+    description: 'The user who made the booking',
+    type: GetUserResponseDto,
+    required: true,
+  })
+  @ValidateNested()
+  @Type(() => GetUserResponseDto)
+  user: GetUserResponseDto;
+
+  constructor(
+    id: number,
+    externalId: string,
+    confirmationNumber: string,
+    user: GetUserResponseDto,
+  ) {
     super(externalId, confirmationNumber);
     this.id = id;
+    this.user = user;
   }
 }
 
@@ -122,6 +139,52 @@ export class GetPaginatedBookingRequestDto extends QueryRequestDto {
   confirmationNumbers?: string[];
 
   @ApiPropertyOptional({
+    description: 'Filter users by IDs',
+    example: [1, 2],
+    type: Number,
+    isArray: true,
+  })
+  @IsNumber({}, { each: true })
+  @IsOptional()
+  @ToArray()
+  userIds?: number[];
+
+  @ApiPropertyOptional({
+    description: 'Filter users by email addresses',
+    example: ['johndoe@gmail.com', 'willsmith@gmail.com'],
+    type: String,
+    isArray: true,
+  })
+  @IsEmail({}, { each: true })
+  @IsOptional()
+  @ToArray()
+  emails?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Filter users by first names',
+    example: ['John', 'Will'],
+    type: String,
+    isArray: true,
+    required: false,
+  })
+  @IsString({ each: true })
+  @IsOptional()
+  @ToArray()
+  firstNames?: string[];
+
+  @ApiPropertyOptional({
+    description: 'Filter users by last names',
+    example: ['Doe', 'Smith'],
+    type: String,
+    isArray: true,
+    required: false,
+  })
+  @IsString({ each: true })
+  @IsOptional()
+  @ToArray()
+  lastNames?: string[];
+
+  @ApiPropertyOptional({
     description: 'Booking field name to sort results by',
     enum: BookingSortFields,
     example: BookingSortFields.CREATED_AT,
@@ -143,11 +206,19 @@ export class GetPaginatedBookingRequestDto extends QueryRequestDto {
     ids?: number[],
     externalIds?: string[],
     confirmationNumbers?: string[],
+    userIds?: number[],
+    emails?: string[],
+    firstNames?: string[],
+    lastNames?: string[],
   ) {
     super(page, limit, sortOrder);
     this.sortField = sortField;
     this.ids = ids;
     this.externalIds = externalIds;
     this.confirmationNumbers = confirmationNumbers;
+    this.userIds = userIds;
+    this.emails = emails;
+    this.firstNames = firstNames;
+    this.lastNames = lastNames;
   }
 }

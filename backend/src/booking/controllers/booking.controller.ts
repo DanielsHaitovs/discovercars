@@ -1,8 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Param,
   BadRequestException,
   Query,
@@ -10,86 +8,23 @@ import {
 } from '@nestjs/common';
 import { BookingService } from '../services/booking.service';
 import {
-  CreateBookingDto,
   GetBookingResponseDto,
   GetPaginatedBookingRequestDto,
   GetPaginatedBookingsResponseDto,
 } from '../dto/booking.dto';
 import {
   ApiBadRequestResponse,
-  ApiBody,
-  ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { EntityNotFoundError } from 'typeorm';
 
 @ApiTags('Bookings')
 @Controller('booking')
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
-
-  @Post()
-  @ApiOperation({
-    summary: 'Create a new booking',
-    description: 'Creates a new booking with the provided information.',
-  })
-  @ApiBody({
-    type: CreateBookingDto,
-    description: 'Data transfer object for creating a booking',
-    required: true,
-  })
-  @ApiConflictResponse({
-    description:
-      'A booking with the same externalId or confirmationNumber already exists.',
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid input data. Please check the request body.',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: { type: 'number', example: 400 },
-        message: {
-          type: 'array',
-          items: { type: 'string' },
-          example: [
-            'externalId must be a string',
-            'externalId should not be empty',
-            'confirmationNumber should not be empty',
-            'confirmationNumber must be between 3 and 50 characters',
-            'userId must be an integer',
-            'userId should not be empty',
-          ],
-        },
-        error: { type: 'string', example: BadRequestException.name },
-      },
-    },
-  })
-  @ApiNotFoundResponse({
-    description: 'User not found. No user exists with the provided userId.',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: { type: 'number', example: 404 },
-        message: {
-          type: 'string',
-          example: 'Could not find any entity of type User',
-        },
-        error: { type: 'string', example: EntityNotFoundError.name },
-      },
-    },
-  })
-  @ApiOkResponse({
-    description: 'The booking has been successfully created.',
-    type: GetBookingResponseDto,
-  })
-  async create(@Body() createBookingDto: CreateBookingDto) {
-    return await this.bookingService.create(createBookingDto);
-  }
-
   @Get('query')
   @ApiOperation({
     summary: 'Get paginated list of bookings',

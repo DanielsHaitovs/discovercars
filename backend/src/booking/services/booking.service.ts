@@ -90,6 +90,10 @@ export class BookingService {
       sortField,
       externalIds,
       confirmationNumbers,
+      userIds,
+      emails,
+      firstNames,
+      lastNames,
     } = data;
 
     const queryBuilder = this.bookingRepository
@@ -113,6 +117,28 @@ export class BookingService {
 
     if (ids?.length) {
       queryBuilder.andWhere('booking.id IN (:...ids)', { ids });
+    }
+
+    queryBuilder.leftJoinAndSelect('booking.user', 'user');
+
+    if (userIds?.length) {
+      queryBuilder.andWhere('user.id IN (:...userIds)', { userIds });
+    }
+
+    if (emails?.length) {
+      queryBuilder.andWhere('user.email IN (:...emails)', { emails });
+    }
+
+    if (firstNames?.length) {
+      queryBuilder.andWhere('user.firstName IN (:...firstNames)', {
+        firstNames,
+      });
+    }
+
+    if (lastNames?.length) {
+      queryBuilder.andWhere('user.lastName IN (:...lastNames)', {
+        lastNames,
+      });
     }
 
     const [items, totalCount] = await queryBuilder.getManyAndCount();
