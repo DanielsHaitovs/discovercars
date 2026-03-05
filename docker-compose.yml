@@ -36,6 +36,7 @@ services:
       DATABASE_USER: ${DB_USER}
       DATABASE_PASSWORD: ${DB_PASSWORD}
       DATABASE_NAME: ${DB_NAME}
+      BASE_DISCOVER_CARS_API_URL: ${BASE_DISCOVER_CARS_API_URL}
     command: npm run start:dev
 
   frontend:
