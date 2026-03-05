@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsEmail,
   IsEnum,
@@ -9,7 +9,6 @@ import {
   IsString,
   ValidateNested,
 } from 'class-validator';
-import { ToArray } from 'src/common/array.decorator';
 import {
   PaginatedResponseDto,
   QueryRequestDto,
@@ -97,9 +96,11 @@ export class GetPaginatedUserRequestDto extends QueryRequestDto {
     type: Number,
     isArray: true,
   })
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(Number) : [Number(value)],
+  )
   @IsNumber({}, { each: true })
   @IsOptional()
-  @ToArray()
   ids?: number[];
 
   @ApiPropertyOptional({
@@ -110,7 +111,9 @@ export class GetPaginatedUserRequestDto extends QueryRequestDto {
   })
   @IsEmail({}, { each: true })
   @IsOptional()
-  @ToArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(String) : [String(value)],
+  )
   emails?: string[];
 
   @ApiPropertyOptional({
@@ -122,7 +125,9 @@ export class GetPaginatedUserRequestDto extends QueryRequestDto {
   })
   @IsString({ each: true })
   @IsOptional()
-  @ToArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(String) : [String(value)],
+  )
   firstNames?: string[];
 
   @ApiPropertyOptional({
@@ -134,7 +139,9 @@ export class GetPaginatedUserRequestDto extends QueryRequestDto {
   })
   @IsString({ each: true })
   @IsOptional()
-  @ToArray()
+  @Transform(({ value }) =>
+    Array.isArray(value) ? value.map(String) : [String(value)],
+  )
   lastNames?: string[];
 
   @ApiPropertyOptional({

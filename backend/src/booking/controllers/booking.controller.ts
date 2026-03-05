@@ -1,8 +1,6 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Param,
   BadRequestException,
   Query,
@@ -10,86 +8,25 @@ import {
 } from '@nestjs/common';
 import { BookingService } from '../services/booking.service';
 import {
-  CreateBookingDto,
   GetBookingResponseDto,
+  GetPagiantedUserBookingsRequestDto,
   GetPaginatedBookingRequestDto,
   GetPaginatedBookingsResponseDto,
+  getPaginatedUserBookingsResponseDto,
 } from '../dto/booking.dto';
 import {
   ApiBadRequestResponse,
-  ApiBody,
-  ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
-import { EntityNotFoundError } from 'typeorm';
 
 @ApiTags('Bookings')
 @Controller('booking')
 export class BookingController {
   constructor(private readonly bookingService: BookingService) {}
-
-  @Post()
-  @ApiOperation({
-    summary: 'Create a new booking',
-    description: 'Creates a new booking with the provided information.',
-  })
-  @ApiBody({
-    type: CreateBookingDto,
-    description: 'Data transfer object for creating a booking',
-    required: true,
-  })
-  @ApiConflictResponse({
-    description:
-      'A booking with the same externalId or confirmationNumber already exists.',
-  })
-  @ApiBadRequestResponse({
-    description: 'Invalid input data. Please check the request body.',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: { type: 'number', example: 400 },
-        message: {
-          type: 'array',
-          items: { type: 'string' },
-          example: [
-            'externalId must be a string',
-            'externalId should not be empty',
-            'confirmationNumber should not be empty',
-            'confirmationNumber must be between 3 and 50 characters',
-            'userId must be an integer',
-            'userId should not be empty',
-          ],
-        },
-        error: { type: 'string', example: BadRequestException.name },
-      },
-    },
-  })
-  @ApiNotFoundResponse({
-    description: 'User not found. No user exists with the provided userId.',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: { type: 'number', example: 404 },
-        message: {
-          type: 'string',
-          example: 'Could not find any entity of type User',
-        },
-        error: { type: 'string', example: EntityNotFoundError.name },
-      },
-    },
-  })
-  @ApiOkResponse({
-    description: 'The booking has been successfully created.',
-    type: GetBookingResponseDto,
-  })
-  async create(@Body() createBookingDto: CreateBookingDto) {
-    return await this.bookingService.create(createBookingDto);
-  }
-
   @Get('query')
   @ApiOperation({
     summary: 'Get paginated list of bookings',
@@ -154,26 +91,26 @@ export class BookingController {
     return await this.bookingService.findOneByIdOrThrow(id);
   }
 
-  @Get(':externalId')
+  @Get('user/:userId')
   @ApiParam({
-    name: 'externalId',
-    description: 'The unique external identifier of the booking to retrieve',
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    name: 'userId',
+    description: 'The unique identifier of the user to retrieve bookings for',
+    example: 1,
   })
   @ApiOperation({
-    summary: 'Get booking by external ID',
-    description: 'Retrieves a booking by its unique external identifier.',
+    summary: 'Get bookings for a specific user',
+    description:
+      'Retrieves a paginated list of bookings associated with a specific user based on the provided user ID and pagination parameters.',
   })
   @ApiBadRequestResponse({
-    description:
-      'Invalid booking external ID. Please ensure the external ID is a valid string.',
+    description: 'Invalid user ID. Please ensure the ID is a valid integer.',
     schema: {
       type: 'object',
       properties: {
         statusCode: { type: 'number', example: 400 },
         message: {
           type: 'string',
-          example: 'Validation failed (string is expected)',
+          example: 'Validation failed (numeric string is expected)',
         },
         error: { type: 'string', example: BadRequestException.name },
       },
@@ -181,25 +118,28 @@ export class BookingController {
   })
   @ApiNotFoundResponse({
     description:
-      'Booking not found. No booking exists with the provided external ID.',
+      'No bookings found for the specified user or invalid response from the database.',
     schema: {
       type: 'object',
       properties: {
         statusCode: { type: 'number', example: 404 },
         message: {
           type: 'string',
-          example:
-            'No entity found for Booking with externalId 123e4567-e89b-12d3-a456-426614174000',
+          example: 'No bookings found for user with id 1',
         },
         error: { type: 'string', example: 'EntityNotFoundError' },
       },
     },
   })
   @ApiOkResponse({
-    description: 'The booking has been successfully retrieved.',
-    type: GetBookingResponseDto,
+    description:
+      'The paginated list of bookings for the specified user has been successfully retrieved.',
+    type: getPaginatedUserBookingsResponseDto,
   })
-  async findOneByExternalId(@Param('externalId') externalId: string) {
-    return await this.bookingService.findOneByExternalIdOrThrow(externalId);
+  async findManyByUserId(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query() filters: GetPagiantedUserBookingsRequestDto,
+  ) {
+    return await this.bookingService.getUserBookings({ userId, filters });
   }
 }

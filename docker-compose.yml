@@ -37,6 +37,7 @@ services:
       DATABASE_PASSWORD: ${DB_PASSWORD}
       DATABASE_NAME: ${DB_NAME}
       BASE_DISCOVER_CARS_API_URL: ${BASE_DISCOVER_CARS_API_URL}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN}
     command: npm run start:dev
 
   frontend:
@@ -48,7 +49,7 @@ services:
     env_file:
       - .env
     environment:
-      EXTERNAL_API_URL: ${EXTERNAL_API_URL}
+      NEXT_PUBLIC_BACKEND_ORIGIN: ${NEXT_PUBLIC_BACKEND_ORIGIN}
     depends_on:
       - backend
     ports:

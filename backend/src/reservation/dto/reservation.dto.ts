@@ -182,10 +182,10 @@ export class CreateReservationDto {
   })
   @IsString()
   @IsNotEmpty()
-  externalId: string;
+  offerUId: string;
 
-  constructor(userId: number, externalId: string) {
+  constructor(userId: number, offerUId: string) {
     this.userId = userId;
-    this.externalId = externalId;
+    this.offerUId = offerUId;
   }
 }

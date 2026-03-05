@@ -22,6 +22,11 @@ async function bootstrap() {
 
   app.useGlobalFilters(new EntityNotFoundFilter());
 
+  app.enableCors({
+    origin: process.env.FRONTEND_ORIGIN ?? 'http://localhost:3000',
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
     .setTitle('DiscoverCars API')
     .setDescription('API documentation for DiscoverCars backend')

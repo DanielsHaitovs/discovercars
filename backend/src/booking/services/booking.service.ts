@@ -2,8 +2,10 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import {
   CreateBookingDto,
   GetBookingResponseDto,
+  GetPagiantedUserBookingsRequestDto,
   GetPaginatedBookingRequestDto,
   GetPaginatedBookingsResponseDto,
+  getPaginatedUserBookingsResponseDto,
 } from '../dto/booking.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booking } from '../entities/booking.entity';
@@ -63,18 +65,6 @@ export class BookingService {
   }
 
   /**
-   * Retrieves a single booking by its external ID.
-   * @param externalId - The external ID of the booking to retrieve.
-   * @returns The booking corresponding to the provided external ID as a GetBookingResponseDto.
-   * @throws EntityNotFoundError if no booking with the given external ID exists.
-   */
-  async findOneByExternalIdOrThrow(
-    externalId: string,
-  ): Promise<GetBookingResponseDto> {
-    return await this.bookingRepository.findOneByOrFail({ externalId });
-  }
-
-  /**
    * Retrieves a paginated list of bookings based on the provided query parameters.
    * @param data - Data transfer object containing pagination, sorting, and filtering details.
    * @returns A paginated response containing the list of bookings and pagination metadata.
@@ -90,6 +80,10 @@ export class BookingService {
       sortField,
       externalIds,
       confirmationNumbers,
+      userIds,
+      emails,
+      firstNames,
+      lastNames,
     } = data;
 
     const queryBuilder = this.bookingRepository
@@ -114,6 +108,62 @@ export class BookingService {
     if (ids?.length) {
       queryBuilder.andWhere('booking.id IN (:...ids)', { ids });
     }
+
+    queryBuilder.leftJoinAndSelect('booking.user', 'user');
+
+    if (userIds?.length) {
+      queryBuilder.andWhere('user.id IN (:...userIds)', { userIds });
+    }
+
+    if (emails?.length) {
+      queryBuilder.andWhere('user.email IN (:...emails)', { emails });
+    }
+
+    if (firstNames?.length) {
+      queryBuilder.andWhere('user.firstName IN (:...firstNames)', {
+        firstNames,
+      });
+    }
+
+    if (lastNames?.length) {
+      queryBuilder.andWhere('user.lastName IN (:...lastNames)', {
+        lastNames,
+      });
+    }
+
+    const [items, totalCount] = await queryBuilder.getManyAndCount();
+
+    return {
+      total: totalCount,
+      page: page,
+      limit,
+      totalPages: Math.ceil(totalCount / limit),
+      data: items,
+    };
+  }
+
+  /**
+   * Retrieves a paginated list of bookings for a specific user based on the provided query parameters.
+   * @param userId - The unique identifier of the user whose bookings are to be retrieved.
+   * @param filters - Data transfer object containing pagination, sorting, and filtering details specific to user bookings.
+   * @returns A paginated response containing the list of bookings for the specified user and pagination metadata.
+   */
+  async getUserBookings({
+    userId,
+    filters,
+  }: {
+    userId: number;
+    filters: GetPagiantedUserBookingsRequestDto;
+  }): Promise<getPaginatedUserBookingsResponseDto> {
+    const { page, limit, sortField, sortOrder } = filters;
+
+    const queryBuilder = this.bookingRepository
+      .createQueryBuilder('booking')
+      .leftJoinAndSelect('booking.user', 'user')
+      .where('user.id = :userId', { userId })
+      .orderBy(`booking.${sortField}`, sortOrder)
+      .skip((page - 1) * limit)
+      .take(limit);
 
     const [items, totalCount] = await queryBuilder.getManyAndCount();
 
