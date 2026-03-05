@@ -7,7 +7,6 @@ import {
   BadRequestException,
   Query,
   ParseIntPipe,
-  ParseUUIDPipe,
 } from '@nestjs/common';
 import { BookingService } from '../services/booking.service';
 import {
@@ -57,7 +56,7 @@ export class BookingController {
           type: 'array',
           items: { type: 'string' },
           example: [
-            'externalId must be a UUID',
+            'externalId must be a string',
             'externalId should not be empty',
             'confirmationNumber should not be empty',
             'confirmationNumber must be between 3 and 50 characters',
@@ -167,14 +166,14 @@ export class BookingController {
   })
   @ApiBadRequestResponse({
     description:
-      'Invalid booking external ID. Please ensure the external ID is a valid UUID.',
+      'Invalid booking external ID. Please ensure the external ID is a valid string.',
     schema: {
       type: 'object',
       properties: {
         statusCode: { type: 'number', example: 400 },
         message: {
           type: 'string',
-          example: 'Validation failed (UUID string is expected)',
+          example: 'Validation failed (string is expected)',
         },
         error: { type: 'string', example: BadRequestException.name },
       },
@@ -200,9 +199,7 @@ export class BookingController {
     description: 'The booking has been successfully retrieved.',
     type: GetBookingResponseDto,
   })
-  async findOneByExternalId(
-    @Param('externalId', ParseUUIDPipe) externalId: string,
-  ) {
+  async findOneByExternalId(@Param('externalId') externalId: string) {
     return await this.bookingService.findOneByExternalIdOrThrow(externalId);
   }
 }

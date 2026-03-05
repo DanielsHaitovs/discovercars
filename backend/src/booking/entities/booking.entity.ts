@@ -1,5 +1,4 @@
 import { IsString } from 'class-validator';
-import { type UUID } from 'crypto';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -20,10 +19,12 @@ export class Booking {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'uuid', unique: true })
+  @Column()
+  @IsString()
   externalId: string;
 
-  @Column({ length: 255, unique: true })
+  // Would be better to have a unique constraint on this field, but the external API doesn't guarantee uniqueness.
+  @Column({ length: 255 })
   @IsString()
   confirmationNumber: string;
 
@@ -41,7 +42,7 @@ export class Booking {
 
   constructor(
     id: number,
-    externalId: UUID,
+    externalId: string,
     createdAt: Date,
     updatedAt: Date,
     user: User,

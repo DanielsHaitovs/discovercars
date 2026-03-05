@@ -163,3 +163,29 @@ export class ReservationRequestDto {
     this.offerUId = offerUId;
   }
 }
+
+export class CreateReservationDto {
+  @ApiProperty({
+    description: 'The ID of the user making the reservation',
+    example: 1,
+    type: Number,
+    required: true,
+  })
+  @IsNumber()
+  @IsNotEmpty()
+  userId: number;
+
+  @ApiProperty({
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    type: String,
+    required: true,
+  })
+  @IsString()
+  @IsNotEmpty()
+  externalId: string;
+
+  constructor(userId: number, externalId: string) {
+    this.userId = userId;
+    this.externalId = externalId;
+  }
+}

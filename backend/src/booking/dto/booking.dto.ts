@@ -1,6 +1,5 @@
 import {
   IsString,
-  IsUUID,
   IsNotEmpty,
   IsInt,
   MinLength,
@@ -21,7 +20,7 @@ import { BookingSortFields } from '../booking.enum';
 
 export class CreateBookingDto {
   @ApiProperty({ example: '550e8400-e29b-41d4-a716-446655440000' })
-  @IsUUID('all')
+  @IsString()
   @IsNotEmpty()
   externalId: string;
 
@@ -106,7 +105,7 @@ export class GetPaginatedBookingRequestDto extends QueryRequestDto {
     type: String,
     isArray: true,
   })
-  @IsUUID('all', { each: true })
+  @IsString({ each: true })
   @IsOptional()
   @ToArray()
   externalIds?: string[];

@@ -28,7 +28,12 @@ export class BookingService {
   async create(
     createBookingDto: CreateBookingDto,
   ): Promise<GetBookingResponseDto> {
-    const booking = this.bookingRepository.create(createBookingDto);
+    const { userId, ...bookingData } = createBookingDto;
+
+    const booking = this.bookingRepository.create({
+      ...bookingData,
+      user: { id: userId } as User,
+    });
 
     return await this.bookingRepository
       .save(booking)
@@ -69,6 +74,11 @@ export class BookingService {
     return await this.bookingRepository.findOneByOrFail({ externalId });
   }
 
+  /**
+   * Retrieves a paginated list of bookings based on the provided query parameters.
+   * @param data - Data transfer object containing pagination, sorting, and filtering details.
+   * @returns A paginated response containing the list of bookings and pagination metadata.
+   */
   async findMany(
     data: GetPaginatedBookingRequestDto,
   ): Promise<GetPaginatedBookingsResponseDto> {

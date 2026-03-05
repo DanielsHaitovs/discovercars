@@ -6,7 +6,6 @@ import {
   ParseIntPipe,
   Post,
 } from '@nestjs/common';
-import { DiscoverCarsService } from './discoverCars.service';
 import {
   ApiBody,
   ApiInternalServerErrorResponse,
@@ -16,15 +15,16 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import {
+  CreateReservationDto,
   LocationDto,
   OfferDto,
-  ReservationDto,
-  ReservationRequestDto,
-} from './dto/discoverCars.dto';
+} from './dto/reservation.dto';
+import { ReservationService } from './reservation.service';
+import { GetBookingResponseDto } from 'src/booking/dto/booking.dto';
 
-@Controller('discoverCars')
-export class DiscoverCarsController {
-  constructor(private readonly discoverCarsService: DiscoverCarsService) {}
+@Controller('reservation')
+export class ReservationController {
+  constructor(private readonly reservationService: ReservationService) {}
 
   @Get('locations')
   @ApiOperation({
@@ -47,7 +47,7 @@ export class DiscoverCarsController {
       'No available locations found or invalid response from the external API.',
   })
   async getAvailableLocations() {
-    return this.discoverCarsService.getAvailableLocations();
+    return this.reservationService.getAvailableLocations();
   }
 
   @Get('offers/:locationId')
@@ -77,13 +77,13 @@ export class DiscoverCarsController {
   async getLocationOffers(
     @Param('locationId', ParseIntPipe) locationId: number,
   ) {
-    return this.discoverCarsService.getLocationOffers(locationId);
+    return this.reservationService.getLocationOffers(locationId);
   }
 
-  @Post('reserve')
+  @Post()
   @ApiBody({
     description: 'Data required to create a car rental reservation',
-    type: ReservationRequestDto,
+    type: CreateReservationDto,
   })
   @ApiOperation({
     summary: 'Create a new car rental reservation',
@@ -91,7 +91,7 @@ export class DiscoverCarsController {
   })
   @ApiOkResponse({
     description: 'Car rental reservation created successfully.',
-    type: ReservationDto,
+    type: GetBookingResponseDto,
   })
   @ApiInternalServerErrorResponse({
     description: 'An error occurred while creating the car rental reservation.',
@@ -100,7 +100,7 @@ export class DiscoverCarsController {
     description:
       'Invalid response from the external API when creating the reservation.',
   })
-  async createReservation(@Body() data: ReservationRequestDto) {
-    return this.discoverCarsService.createReservation(data);
+  async createReservation(@Body() data: CreateReservationDto) {
+    return this.reservationService.createReservation(data);
   }
 }
