@@ -29,3 +29,12 @@ export type GetPaginatedBookingsRequest = PaginationRequest & {
 export type GetPaginatedBookingsResponse = PaginationRequest & {
   data: GetBookingResponseDto[];
 }
+
+export type GetPaginatedUserBookingsRequest = PaginationRequest & {
+  userId: number | null;
+  sortField?: typeof BookingSortFields[number];
+}
+
+export type GetPaginatedUserBookingsResponse = PaginationRequest & {
+  data: GetBookingResponseDto[];
+}

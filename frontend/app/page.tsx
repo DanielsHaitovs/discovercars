@@ -8,6 +8,7 @@ import { getBookingsQuery, useGetBookingsQuery } from "./actions/booking/getBook
 import { getBookingByIdQuery } from "./actions/booking/getBookingById";
 import { getLocationsQuery } from "./actions/reservation/getLocations";
 import { getOffersByLocationIdQuery } from "./actions/reservation/getOffersByLocationId";
+import { getUserBookingsQuery, useGetUserBookingsQuery } from "./actions/booking/getUserBookings";
 
 export default function Home() {
   const usersQuery = useGetUsersQuery();
@@ -36,12 +37,16 @@ export default function Home() {
 
   const { data: offers, isLoading: isOffersLoading, isError: isOffersError, error: offersError, isFetching: isOffersFetching } = useQuery(getOffersByLocationIdQuery(1));
 
+  const userBookingsQuery = useGetUserBookingsQuery();
+
+  const { data: userBookings, isLoading: isUserBookingsLoading, isError: isUserBookingsError, error: userBookingsError, isFetching: isUserBookingsFetching } = useQuery(getUserBookingsQuery({ ...userBookingsQuery, userId: 4 }));
   console.log(users);
   console.log(user);
   console.log(bookings);
   console.log(booking);
   console.log(locations);
   console.log(offers);
+  console.log(userBookings);
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">

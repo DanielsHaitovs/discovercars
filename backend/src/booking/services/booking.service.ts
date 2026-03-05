@@ -2,8 +2,10 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import {
   CreateBookingDto,
   GetBookingResponseDto,
+  GetPagiantedUserBookingsRequestDto,
   GetPaginatedBookingRequestDto,
   GetPaginatedBookingsResponseDto,
+  getPaginatedUserBookingsResponseDto,
 } from '../dto/booking.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Booking } from '../entities/booking.entity';
@@ -128,6 +130,40 @@ export class BookingService {
         lastNames,
       });
     }
+
+    const [items, totalCount] = await queryBuilder.getManyAndCount();
+
+    return {
+      total: totalCount,
+      page: page,
+      limit,
+      totalPages: Math.ceil(totalCount / limit),
+      data: items,
+    };
+  }
+
+  /**
+   * Retrieves a paginated list of bookings for a specific user based on the provided query parameters.
+   * @param userId - The unique identifier of the user whose bookings are to be retrieved.
+   * @param filters - Data transfer object containing pagination, sorting, and filtering details specific to user bookings.
+   * @returns A paginated response containing the list of bookings for the specified user and pagination metadata.
+   */
+  async getUserBookings({
+    userId,
+    filters,
+  }: {
+    userId: number;
+    filters: GetPagiantedUserBookingsRequestDto;
+  }): Promise<getPaginatedUserBookingsResponseDto> {
+    const { page, limit, sortField, sortOrder } = filters;
+
+    const queryBuilder = this.bookingRepository
+      .createQueryBuilder('booking')
+      .leftJoinAndSelect('booking.user', 'user')
+      .where('user.id = :userId', { userId })
+      .orderBy(`booking.${sortField}`, sortOrder)
+      .skip((page - 1) * limit)
+      .take(limit);
 
     const [items, totalCount] = await queryBuilder.getManyAndCount();
 

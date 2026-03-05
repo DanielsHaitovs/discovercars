@@ -62,7 +62,7 @@ export class GetBookingResponseDto extends OmitType(CreateBookingDto, [
 
   @ApiProperty({
     description: 'The user who made the booking',
-    type: GetUserResponseDto,
+    type: () => GetUserResponseDto,
     required: true,
   })
   @ValidateNested()
@@ -78,6 +78,57 @@ export class GetBookingResponseDto extends OmitType(CreateBookingDto, [
     super(externalId, confirmationNumber);
     this.id = id;
     this.user = user;
+  }
+}
+
+export class GetUserBookingsResponseDto extends OmitType(
+  GetBookingResponseDto,
+  ['user'],
+) {}
+
+export class getPaginatedUserBookingsResponseDto extends PaginatedResponseDto {
+  @ApiProperty({
+    description: 'List of bookings for the current page',
+    type: [GetUserBookingsResponseDto],
+  })
+  @ValidateNested({ each: true })
+  @Type(() => GetUserBookingsResponseDto)
+  data: GetUserBookingsResponseDto[];
+
+  constructor(
+    data: GetUserBookingsResponseDto[],
+    total: number,
+    page: number,
+    limit: number,
+  ) {
+    super(total, page, limit);
+    this.data = data;
+  }
+}
+
+export class GetPagiantedUserBookingsRequestDto extends QueryRequestDto {
+  @ApiPropertyOptional({
+    description: 'Booking field name to sort results by',
+    enum: BookingSortFields,
+    example: BookingSortFields.CREATED_AT,
+    type: String,
+  })
+  @IsEnum(BookingSortFields, {
+    message: `sortField must be one of the following: ${Object.values(
+      BookingSortFields,
+    ).join(', ')}`,
+  })
+  @IsOptional()
+  sortField?: BookingSortFields;
+
+  constructor(
+    page: number,
+    limit: number,
+    sortOrder: 'ASC' | 'DESC' = 'ASC',
+    sortField?: BookingSortFields,
+  ) {
+    super(page, limit, sortOrder);
+    this.sortField = sortField;
   }
 }
 

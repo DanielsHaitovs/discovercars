@@ -9,8 +9,10 @@ import {
 import { BookingService } from '../services/booking.service';
 import {
   GetBookingResponseDto,
+  GetPagiantedUserBookingsRequestDto,
   GetPaginatedBookingRequestDto,
   GetPaginatedBookingsResponseDto,
+  getPaginatedUserBookingsResponseDto,
 } from '../dto/booking.dto';
 import {
   ApiBadRequestResponse,
@@ -87,5 +89,57 @@ export class BookingController {
   })
   async findOneById(@Param('id', ParseIntPipe) id: number) {
     return await this.bookingService.findOneByIdOrThrow(id);
+  }
+
+  @Get('user/:userId')
+  @ApiParam({
+    name: 'userId',
+    description: 'The unique identifier of the user to retrieve bookings for',
+    example: 1,
+  })
+  @ApiOperation({
+    summary: 'Get bookings for a specific user',
+    description:
+      'Retrieves a paginated list of bookings associated with a specific user based on the provided user ID and pagination parameters.',
+  })
+  @ApiBadRequestResponse({
+    description: 'Invalid user ID. Please ensure the ID is a valid integer.',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 400 },
+        message: {
+          type: 'string',
+          example: 'Validation failed (numeric string is expected)',
+        },
+        error: { type: 'string', example: BadRequestException.name },
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description:
+      'No bookings found for the specified user or invalid response from the database.',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 404 },
+        message: {
+          type: 'string',
+          example: 'No bookings found for user with id 1',
+        },
+        error: { type: 'string', example: 'EntityNotFoundError' },
+      },
+    },
+  })
+  @ApiOkResponse({
+    description:
+      'The paginated list of bookings for the specified user has been successfully retrieved.',
+    type: getPaginatedUserBookingsResponseDto,
+  })
+  async findManyByUserId(
+    @Param('userId', ParseIntPipe) userId: number,
+    @Query() filters: GetPagiantedUserBookingsRequestDto,
+  ) {
+    return await this.bookingService.getUserBookings({ userId, filters });
   }
 }
